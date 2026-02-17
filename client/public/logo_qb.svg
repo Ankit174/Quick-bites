@@ -1,0 +1,6 @@
+<svg width="200" height="200" viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="200" height="200" rx="40" fill="#FF4D4D"/> <!-- Primary Red Color -->
+<path d="M100 160C133.137 160 160 133.137 160 100C160 66.8629 133.137 40 100 40C66.8629 40 40 66.8629 40 100C40 133.137 66.8629 160 100 160Z" stroke="white" stroke-width="12"/>
+<path d="M115 115L145 145" stroke="white" stroke-width="12" stroke-linecap="round"/>
+<text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-weight="bold" font-size="80" fill="white">QB</text>
+</svg>
