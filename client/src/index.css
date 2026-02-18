@@ -1,5 +1,11 @@
 @import "tailwindcss";
 
+@theme {
+  --font-sans: 'Poppins', sans-serif;
+  --color-primary: #ff4d4d;
+  --color-secondary: #2b2b2b;
+}
+
 @layer base {
   body {
     @apply bg-gray-50 text-gray-900 font-sans;

@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -7,6 +8,7 @@ export default function Cart() {
     const { cart, removeFromCart, updateQuantity, cartTotal, clearCart } = useCart();
     const { user } = useAuth();
     const navigate = useNavigate();
+    const [paymentMethod, setPaymentMethod] = useState('Cash');
 
     const handleCheckout = async () => {
         if (!user) {
@@ -23,7 +25,7 @@ export default function Cart() {
                     price: item.price,
                     menu_item: item._id
                 })),
-                paymentMethod: 'Cash', // Mocking for now
+                paymentMethod: paymentMethod,
                 itemsPrice: cartTotal,
                 taxPrice: 0,
                 totalPrice: cartTotal
@@ -31,8 +33,6 @@ export default function Cart() {
 
             const res = await api.post('/orders', orderData);
             clearCart();
-            // Navigate to order success/status page (to be implemented)
-            // navigate(\`/order/\${res.data._id}\`);
             alert('Order Placed Successfully! Token: ' + res.data.tokenNumber);
             navigate('/');
         } catch (error) {
@@ -83,6 +83,47 @@ export default function Cart() {
                     <div className="flex justify-between mb-4 font-bold text-lg border-t pt-2">
                         <span>Total</span>
                         <span>₹{cartTotal}</span>
+                    </div>
+
+                    <div className="mb-6">
+                        <h3 className="font-bold mb-3">Payment Method</h3>
+                        <div className="flex flex-col gap-2">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="payment"
+                                    value="Cash"
+                                    checked={paymentMethod === 'Cash'}
+                                    onChange={(e) => setPaymentMethod(e.target.value)}
+                                    className="accent-primary"
+                                />
+                                <span>Cash on Counter</span>
+                            </label>
+
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="payment"
+                                    value="UPI"
+                                    checked={paymentMethod === 'UPI'}
+                                    onChange={(e) => setPaymentMethod(e.target.value)}
+                                    className="accent-primary"
+                                />
+                                <span>Online (UPI)</span>
+                            </label>
+                        </div>
+
+                        {paymentMethod === 'UPI' && (
+                            <div className="mt-4 flex flex-col items-center p-4 bg-gray-50 rounded-lg border">
+                                <img
+                                    src={`/payment-qr.png?t=${Date.now()}`}
+                                    alt="Payment QR Code"
+                                    className="w-48 h-48 object-contain"
+                                />
+                                <p className="text-sm text-gray-500 mt-2 text-center">Scan & Pay ₹{cartTotal}</p>
+                                <p className="text-xs text-red-500 mt-1 font-bold">Enter amount manually!</p>
+                            </div>
+                        )}
                     </div>
                     <button
                         onClick={handleCheckout}

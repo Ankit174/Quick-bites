@@ -32,9 +32,9 @@ const addOrderItems = async (req, res) => {
 
         const createdOrder = await order.save();
 
-        // Socket.io emit could go here if io instance is accessible
-        // const io = req.app.get('socketio');
-        // io.emit('new_order', createdOrder);
+        // Socket.io emit
+        const io = req.app.get('socketio');
+        io.emit('new_order', createdOrder);
 
         res.status(201).json(createdOrder);
     }
@@ -78,8 +78,8 @@ const updateOrderStatus = async (req, res) => {
     if (order) {
         order.status = req.body.status;
         const updatedOrder = await order.save();
-        // const io = req.app.get('socketio');
-        // io.emit('order_status_updated', updatedOrder);
+        const io = req.app.get('socketio');
+        io.emit('order_status_updated', updatedOrder);
         res.json(updatedOrder);
     } else {
         res.status(404).json({ message: 'Order not found' });

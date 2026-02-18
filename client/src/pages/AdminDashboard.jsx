@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import api from '../services/api';
-import { QRCodeCanvas } from 'qrcode.react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import toast from 'react-hot-toast';
 
@@ -13,6 +12,30 @@ export default function AdminDashboard() {
         image_url: '',
         is_veg: true
     });
+    const [uploading, setUploading] = useState(false);
+
+    const handleUpload = async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('image', file);
+
+        setUploading(true);
+        try {
+            await api.post('/upload', formData, {
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            });
+            toast.success('QR Code uploaded successfully!');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to upload image');
+            console.error('Upload failed:', error.response?.data || error);
+        } finally {
+            setUploading(false);
+        }
+    };
 
     // Mock Data for Analytics
     const data = [
@@ -58,13 +81,32 @@ export default function AdminDashboard() {
                     </div>
                 </div>
 
-                {/* QR Code Generator */}
-                <div className="bg-white p-6 rounded-lg shadow flex flex-col items-center justify-center">
-                    <h2 className="text-xl font-bold mb-4">Table Ordering QR Code</h2>
-                    <div className="bg-white p-4 rounded-lg border-2 border-dashed border-gray-300">
-                        <QRCodeCanvas value="http://localhost:5173" size={200} />
+                <div className="flex flex-col gap-8">
+                    {/* QR Code Upload */}
+                    <div className="bg-white p-6 rounded-lg shadow">
+                        <h2 className="text-xl font-bold mb-4">Update Payment QR Code</h2>
+                        <div className="mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2">
+                                Upload New QR Code Image
+                            </label>
+                            <input
+                                type="file"
+                                accept="image/*"
+                                onChange={handleUpload}
+                                disabled={uploading}
+                                className="block w-full text-sm text-gray-500
+                                  file:mr-4 file:py-2 file:px-4
+                                  file:rounded-full file:border-0
+                                  file:text-sm file:font-semibold
+                                  file:bg-blue-50 file:text-blue-700
+                                  hover:file:bg-blue-100"
+                            />
+                        </div>
+                        {uploading && <p className="text-sm text-blue-600">Uploading...</p>}
+                        <p className="text-xs text-gray-500 mt-2">
+                            This image will be displayed to students during checkout.
+                        </p>
                     </div>
-                    <p className="mt-4 text-sm text-gray-500">Scan to open the Digital Menu</p>
                 </div>
             </div>
 

@@ -1,14 +1,29 @@
 import { useState, useEffect } from 'react';
 import api from '../services/api';
+import { io } from 'socket.io-client';
+import toast from 'react-hot-toast';
 
 export default function StaffDashboard() {
     const [orders, setOrders] = useState([]);
 
     useEffect(() => {
         fetchOrders();
-        // In a real app, socket.on('new_order') while polling fallback
-        const interval = setInterval(fetchOrders, 10000);
-        return () => clearInterval(interval);
+
+        // Socket.io connection using relative path (proxy handles it) or explicit URL
+        const socket = io('http://localhost:5000');
+
+        socket.on('new_order', (newOrder) => {
+            setOrders(prev => [newOrder, ...prev]);
+            toast.success(`New Order #${newOrder.tokenNumber}!`);
+        });
+
+        socket.on('order_status_updated', (updatedOrder) => {
+            setOrders(prev => prev.map(o => o._id === updatedOrder._id ? updatedOrder : o).filter(o => o.status !== 'Delivered'));
+        });
+
+        return () => {
+            socket.disconnect();
+        };
     }, []);
 
     const fetchOrders = async () => {
@@ -42,7 +57,7 @@ export default function StaffDashboard() {
                                 <p className="text-sm text-gray-500">{new Date(order.createdAt).toLocaleTimeString()}</p>
                             </div>
                             <span className={`px-2 py-1 rounded text-xs font-bold ${order.status === 'Ready' ? 'bg-green-100 text-green-800' :
-                                    order.status === 'Preparing' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100'
+                                order.status === 'Preparing' ? 'bg-yellow-100 text-yellow-800' : 'bg-gray-100'
                                 }`}>
                                 {order.status}
                             </span>
