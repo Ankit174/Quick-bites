@@ -1,11 +1,13 @@
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
-import { ShoppingBag } from 'lucide-react';
+import { useChatbot } from '../context/ChatbotContext';
+import { ShoppingBag, Sparkles } from 'lucide-react';
 
 export default function Navbar() {
     const { user, logout } = useAuth();
     const { cart } = useCart();
+    const { toggleChatbot } = useChatbot();
 
     return (
         <nav className="bg-white shadow">
@@ -18,6 +20,13 @@ export default function Navbar() {
                         </Link>
                     </div>
                     <div className="flex items-center space-x-6">
+                        <button
+                            onClick={toggleChatbot}
+                            className="flex items-center gap-1.5 text-orange-500 hover:text-orange-600 font-medium transition-colors bg-orange-50 hover:bg-orange-100 px-3 py-1.5 rounded-full"
+                        >
+                            <Sparkles className="h-4 w-4" />
+                            <span>Ask AI Guru</span>
+                        </button>
                         <Link to="/cart" className="relative text-gray-600 hover:text-primary">
                             <ShoppingBag className="h-6 w-6" />
                             {cart.length > 0 && (
